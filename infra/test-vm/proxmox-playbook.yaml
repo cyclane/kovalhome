@@ -21,4 +21,4 @@
         update: true
     - name: Start test-vm
       community.general.proxmox_kvm:
-        state: started
+        state: restarted

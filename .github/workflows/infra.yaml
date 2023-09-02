@@ -11,12 +11,12 @@ on:
     paths:
       - infra/**-playbook.yaml
       - .github/workflows/infra.yaml
-  fork:
 
 jobs:
   check:
     name: Check infrastructure definitions
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
           pip3 install -r requirements.txt
           ansible-galaxy collection install community.general
 
-      - name: Check modified playbooks
+      - name: Check playbooks
         run: |
           find . -wholename "*/infra/*-playbook.yaml" -type f -exec ansible-playbook --inventory ./inventory --check {} \;
   deploy:
@@ -66,3 +66,24 @@ jobs:
               ansible-playbook --inventory ./inventory "$file"
             fi
           done
+  deploy-all:
+    name: Deploy all infrastructure
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.head_commit.message, '[deploy-all]')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+          ansible-galaxy collection install community.general
+
+      - name: Run playbooks
+        run: |
+          find . -wholename "*/infra/*-playbook.yaml" -type f -exec ansible-playbook --inventory ./inventory {} \;
