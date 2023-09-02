@@ -16,12 +16,13 @@
       register: vm
     - name: Print VM data
       ansible.builtin.debug:
-        msg: "{{ vm }}"
+        var: vm
     - name: Modify test-vm-2
+      when: vm.vmid is defined
       module_defaults:
         community.general.proxmox_kvm:
           vmid: "{{ vm.vmid }}"
-      tasks:
+      block:
         - name: Wait for test-vm-2 to exist
           community.general.proxmox_kvm:
             state: current
