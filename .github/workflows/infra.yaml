@@ -46,18 +46,22 @@ jobs:
         with:
           files: infra/**-playbook.yaml
 
-      - name: Run changed playbooks
-        if: env.DEPLOY == 'some'
-        env:
-          PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
-          PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
-          PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
-        run: ansible-playbook --inventory ./inventory ${{ steps.files.outputs.all_changed_files }}
+      - name: Get playbooks
+        id: playbooks
+        if: env.DEPLOY != 'none'
+        run: |
+          if [[ "${{ env.DEPLOY }}" == "some" ]]; then
+            export TO_RUN="${{ steps.files.outputs.all_changed_files }}"
+          else
+            export TO_RUN="$(find . -wholename './infra/*-playbook.yaml' -type f)"
+          fi
+          echo "will run playbooks: $TO_RUN"
+          echo "to_run=$TO_RUN" >> "$GITHUB_OUTPUT"
 
-      - name: Run all playbooks
-        if: env.DEPLOY == 'all'
-        env:
-          PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
-          PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
-          PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
-        run: ansible-playbook --inventory ./inventory $(find . -wholename "*/infra/*-playbook.yaml" -type f)
+      # - name: Run changed playbooks
+      #   if: env.DEPLOY == 'none'
+      #   env:
+      #     PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+      #     PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
+      #     PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
+      #   run: ansible-playbook --inventory ./inventory ${{ steps.files.outputs.all_changed_files }}
