@@ -1,0 +1,13 @@
+proxmox:
+  children:
+    kovalhome:
+      children:
+        nodes:
+          hosts:
+            pve.mgmt.home.local.koval.net:
+            pve2.mgmt.home.local.koval.net:
+        managed:
+          hosts:
+            test-vm.mgmt.home.local.koval.net:
+        unmanaged:
+          hosts:

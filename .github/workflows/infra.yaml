@@ -1,0 +1,65 @@
+name: Infrastructure
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    tags:
+      - infra/**
+    paths:
+      - infra/**-playbook.yaml
+      - .github/workflows/infra.yaml
+  fork:
+
+jobs:
+  check:
+    name: Check infrastructure definitions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+          ansible-galaxy collection install community.general
+
+      - name: Check modified playbooks
+        run: |
+          find . -wholename "*/infra/*-playbook.yaml" -type f -exec ansible-playbook --inventory ./inventory --check {} \;
+  deploy:
+    name: Deploy modified infrastructure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+          ansible-galaxy collection install community.general
+      
+      - name: Get changed files
+        id: files
+        uses: tj-actions/changed-files@v38
+      
+      - name: Run changed playbooks
+        run: |
+          for file in ${{ steps.files.outputs.all_changed_files }}; do
+            ansible-playbook --inventory ./inventory "$file"
+          done
