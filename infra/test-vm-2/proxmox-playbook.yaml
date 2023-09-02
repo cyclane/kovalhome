@@ -17,7 +17,7 @@
       community.general.proxmox_kvm:
         cpu: x86-64-v3
         memory: 2048
-        cores: 3
+        cores: 4
         update: true
     - name: Start test-vm-2
       community.general.proxmox_kvm:

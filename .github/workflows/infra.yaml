@@ -58,10 +58,10 @@ jobs:
           echo "will run playbooks: $TO_RUN"
           echo "to_run=$TO_RUN" >> "$GITHUB_OUTPUT"
 
-      # - name: Run changed playbooks
-      #   if: env.DEPLOY == 'none'
-      #   env:
-      #     PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
-      #     PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
-      #     PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
-      #   run: ansible-playbook --inventory ./inventory ${{ steps.files.outputs.all_changed_files }}
+      - name: Run playbooks
+        if: env.DEPLOY != 'none'
+        env:
+          PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+          PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
+          PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
+        run: ansible-playbook --inventory ./inventory ${{ steps.playbooks.outputs.to_run }}
