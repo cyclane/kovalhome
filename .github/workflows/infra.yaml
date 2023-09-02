@@ -44,7 +44,7 @@ jobs:
         if: env.DEPLOY == 'some'
         uses: tj-actions/changed-files@v38
         with:
-          files: infra/**-playbook.yaml
+          files: infra/**/*-playbook.yaml
 
       - name: Get playbooks
         id: playbooks
@@ -59,7 +59,7 @@ jobs:
           echo "to_run=$TO_RUN" >> "$GITHUB_OUTPUT"
 
       - name: Run playbooks
-        if: env.DEPLOY != 'none'
+        if: env.DEPLOY != 'none' && steps.playbooks.outputs.to_run != ''
         env:
           PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
           PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
