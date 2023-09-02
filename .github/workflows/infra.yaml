@@ -33,7 +33,9 @@ jobs:
 
       - name: Check playbooks
         run: |
-          find . -wholename "*/infra/*-playbook.yaml" -type f -exec ansible-playbook --inventory ./inventory --check {} \;
+          for file in $(find . -wholename "*/infra/*-playbook.yaml" -type f); do
+            ansible-playbook --inventory ./inventory --check "$file"
+          done
   deploy:
     name: Deploy modified infrastructure
     runs-on: ubuntu-latest
@@ -86,4 +88,6 @@ jobs:
 
       - name: Run playbooks
         run: |
-          find . -wholename "*/infra/*-playbook.yaml" -type f -exec ansible-playbook --inventory ./inventory {} \;
+          for file in $(find . -wholename "*/infra/*-playbook.yaml" -type f); do
+            ansible-playbook --inventory ./inventory "$file"
+          done
