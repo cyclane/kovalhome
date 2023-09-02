@@ -6,25 +6,23 @@ on:
   push:
     branches:
       - main
-    tags:
-      - infra/**
     paths:
       - infra/**-playbook.yaml
       - .github/workflows/infra.yaml
 
 env:
-  PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
-  PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
-  PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
+  DEPLOY: ${{ github.ref == 'refs/heads/main' && ((startsWith(github.event.head_commit.message, '[deploy-all]') && 'all') || ('some')) || 'none' }}
 
 jobs:
-  check:
-    name: Check infrastructure definitions
+  ansible-playbooks:
+    name: Check and run Ansbile playbooks
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ env.DEPLOY == 'some' && 2 || 1 }}
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -41,58 +39,26 @@ jobs:
           for file in $(find . -wholename "*/infra/*-playbook.yaml" -type f); do
             ansible-playbook --inventory ./inventory --check "$file"
           done
-  deploy:
-    name: Deploy modified infrastructure
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-      
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          pip3 install -r requirements.txt
-          ansible-galaxy collection install community.general
-      
-      - name: Get changed files
+      - name: Get changed playbooks
         id: files
+        if: env.DEPLOY == 'some'
         uses: tj-actions/changed-files@v38
-      
-      - name: Run changed playbooks
-        run: |
-          for file in ${{ steps.files.outputs.all_changed_files }}; do
-            if [[ "$file" == *"-playbook.yaml" ]];
-            then
-              ansible-playbook --inventory ./inventory "$file"
-            fi
-          done
-  deploy-all:
-    name: Deploy all infrastructure
-    runs-on: ubuntu-latest
-    if: startsWith(github.event.head_commit.message, '[deploy-all]')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          files: infra/**-playbook.yaml
 
-      - name: Install dependencies
-        run: |
-          pip3 install -r requirements.txt
-          ansible-galaxy collection install community.general
+      - name: Run changed playbooks
+        if: env.DEPLOY == 'some'
+        env:
+          PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+          PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
+          PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
+        run: ansible-playbook --inventory ./inventory ${{ steps.files.outputs.all_changed_files }}
 
-      - name: Run playbooks
-        run: |
-          for file in $(find . -wholename "*/infra/*-playbook.yaml" -type f); do
-            ansible-playbook --inventory ./inventory "$file"
-          done
+      - name: Run all playbooks
+        if: env.DEPLOY == 'all'
+        env:
+          PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+          PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
+          PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
+        run: ansible-playbook --inventory ./inventory $(find . -wholename "*/infra/*-playbook.yaml" -type f)
