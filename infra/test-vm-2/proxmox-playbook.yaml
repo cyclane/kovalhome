@@ -11,8 +11,6 @@
   tasks:
     - name: Create test-vm-2
       community.general.proxmox_kvm:
-        name: test-vm
-        node: pve
     - name: Update test-vm-2
       community.general.proxmox_kvm:
         cpu: x86-64-v3
