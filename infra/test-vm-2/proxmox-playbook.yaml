@@ -13,27 +13,17 @@
       community.general.proxmox_kvm:
         tags:
           - managed
-      register: vm
-    - name: Print VM data
-      ansible.builtin.debug:
-        var: vm
-    - name: Modify test-vm-2
-      when: vm.vmid is defined
-      module_defaults:
-        community.general.proxmox_kvm:
-          vmid: "{{ vm.vmid }}"
-      block:
-        - name: Wait for test-vm-2 to exist
-          community.general.proxmox_kvm:
-            state: current
-          retries: 30
-          delay: 10
-        - name: Update test-vm-2
-          community.general.proxmox_kvm:
-            cpu: x86-64-v3
-            memory: 2048
-            cores: 5
-            update: true
-        - name: Start test-vm-2
-          community.general.proxmox_kvm:
-            state: restarted
+    - name: Wait for test-vm-2 to exist
+      community.general.proxmox_kvm:
+        state: current
+      retries: 30
+      delay: 10
+    - name: Update test-vm-2
+      community.general.proxmox_kvm:
+        cpu: x86-64-v3
+        memory: 2048
+        cores: 5
+        update: true
+    - name: Start test-vm-2
+      community.general.proxmox_kvm:
+        state: restarted
