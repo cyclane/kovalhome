@@ -55,6 +55,7 @@ jobs:
           else
             export TO_RUN="$(find . -wholename './infra/*-playbook.yaml' -type f)"
           fi
+          export TO_RUN="$( echo -n $TO_RUN | tr ' ' '\n' | sort | tr '\n' ' ' )" # run things in order :)
           echo "will run playbooks: $TO_RUN"
           echo "to_run=$TO_RUN" >> "$GITHUB_OUTPUT"
 
