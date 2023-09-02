@@ -12,6 +12,11 @@ on:
       - infra/**-playbook.yaml
       - .github/workflows/infra.yaml
 
+env:
+  PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+  PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
+  PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
+
 jobs:
   check:
     name: Check infrastructure definitions
