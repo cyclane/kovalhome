@@ -8,6 +8,5 @@ proxmox:
             pve2.mgmt.home.local.koval.net:
         managed:
           hosts:
-            test-vm.mgmt.home.local.koval.net:
         unmanaged:
           hosts:
