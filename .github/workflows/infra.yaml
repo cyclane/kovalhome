@@ -61,5 +61,8 @@ jobs:
       - name: Run changed playbooks
         run: |
           for file in ${{ steps.files.outputs.all_changed_files }}; do
-            ansible-playbook --inventory ./inventory "$file"
+            if [[ "$file" == *"-playbook.yaml" ]];
+            then
+              ansible-playbook --inventory ./inventory "$file"
+            fi
           done
