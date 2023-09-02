@@ -11,6 +11,10 @@
   tasks:
     - name: Create test-vm-2
       community.general.proxmox_kvm:
+      register: create_data
+    - name: Print create_data
+      ansible.builtin.debug:
+        msg: "{{ create_data }}"
     - name: Update test-vm-2
       community.general.proxmox_kvm:
         cpu: x86-64-v3
