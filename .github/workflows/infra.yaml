@@ -3,12 +3,12 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - main
     paths:
       - infra/**-playbook.yaml
       - .github/workflows/infra.yaml
+  push:
+    branches:
+      - main
 
 env:
   DEPLOY: ${{ github.ref == 'refs/heads/main' && ((startsWith(github.event.head_commit.message, '[deploy-all]') && 'all') || ('some')) || 'none' }}
