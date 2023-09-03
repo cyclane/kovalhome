@@ -63,6 +63,7 @@ jobs:
         if: env.DEPLOY != 'none' && steps.playbooks.outputs.to_run != ''
         env:
           PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+          PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
           PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
           PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
         run: ansible-playbook --inventory ./inventory ${{ steps.playbooks.outputs.to_run }}
