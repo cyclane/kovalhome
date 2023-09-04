@@ -1,0 +1,85 @@
+- name: Provision joplin Proxmox VM
+  hosts: localhost
+  vars:
+    api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+    api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST' ) }}"
+    api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+    api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+    ssh_public: "{{ lookup('ansible.builtin.env', 'SSH_PUBLIC') }}"
+    vmname: joplin
+    node: pve
+  module_defaults:
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+      node: "{{ node }}"
+    community.general.proxmox_nic:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+    community.general.proxmox_disk:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+  tasks:
+    - name: Create VM
+      community.general.proxmox_kvm:
+        clone: "{{ node }}-debian-12"
+        storage: nvme
+    - name: Wait for VM to exist
+      community.general.proxmox_kvm:
+        state: current
+      register: vm
+      retries: 30
+      delay: 10
+      until: vm.status is defined
+    - name: Add HOME NIC
+      community.general.proxmox_nic:
+        interface: net0
+        firewall: false
+        bridge: HOME
+    - name: Add SRV NIC
+      community.general.proxmox_nic:
+        interface: net1
+        firewall: false
+        bridge: SRV
+    - name: Resize disk
+      community.general.proxmox_disk:
+        disk: scsi0
+        size: 64G
+        state: resized
+    - name: Update VM
+      community.general.proxmox_kvm:
+        update: true
+        ciuser: debian
+        sshkeys: "{{ ssh_public }}"
+        ipconfig:
+          ipconfig0: ip=dhcp,ip6=auto
+          ipconfig1: ip=dhcp,ip6=auto
+        agent: enabled=1
+        tags:
+          - debian-12
+          - managed
+        onboot: true
+        cores: 2
+        memory: 2048
+    - name: Retart VM # doesn't start if stopped
+      when:
+        - vm.status is defined
+        - vm.status == "running"
+      community.general.proxmox_kvm:
+        state: restarted
+        timeout: 60
+    - name: Start VM # start if stopped
+      when:
+        - vm.status is defined
+        - vm.status != "running"
+      community.general.proxmox_kvm:
+        state: started
