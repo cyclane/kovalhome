@@ -5,17 +5,17 @@
     - name: Debug
       ansible.builtin.debug:
         msg: "{{ inventory_hostname }}"
-    - name: Wait for connection
-      ansible.builtin.wait_for:
-        host: "{{ inventory_hostname }}"
-        port: 22
-        timeout: 300
     - name: Wut
       ansible.builtin.shell: |
         ping -c 5 {{ inventory_hostname }}
       args:
         executable: /bin/bash
       delegate_to: localhost
+    - name: Wait for connection
+      ansible.builtin.wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        timeout: 300
     - name: Test some stuff
       ansible.builtin.shell: |
         touch ~/hmm
