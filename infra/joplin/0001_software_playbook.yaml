@@ -1,4 +1,4 @@
-- name: Setup Docker
+- name: Setup Software
   hosts: joplin
   gather_facts: false
   tasks:
