@@ -66,8 +66,6 @@ jobs:
           mkdir -p -m 700 ~/.ssh
           echo "${{ secrets.SSH_PRIVATE }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          cat ~/.ssh/id_rsa | wc -c
-          cat ~/.ssh/id_rsa | wc -l
 
       - name: Run playbooks
         if: env.DEPLOY != 'none' && steps.playbooks.outputs.to_run != ''
