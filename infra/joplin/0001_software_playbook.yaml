@@ -11,6 +11,7 @@
     - name: Wait for 10s
       ansible.builtin.wait_for:
         timeout: 10
+      delegate_to: localhost
     - name: Ping
       ansible.builtin.shell: |
         ping -c 5 {{ inventory_hostname }}
