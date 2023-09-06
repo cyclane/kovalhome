@@ -14,6 +14,7 @@
       delegate_to: localhost
     - name: Ping
       ansible.builtin.shell: |
+        apt update && apt install -y iputils-ping
         ping -c 5 {{ inventory_hostname }}
       delegate_to: localhost
     - name: Test some stuff
