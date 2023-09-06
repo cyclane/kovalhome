@@ -26,6 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          apt update
           apt install -y python3-pip
           pip3 install -r requirements.txt
           ansible-galaxy collection install community.general
