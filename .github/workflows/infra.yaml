@@ -33,6 +33,7 @@ jobs:
         run: |
           pip3 install -r requirements.txt
           ansible-galaxy collection install community.general
+          id
 
       - name: Check playbooks
         run: |
