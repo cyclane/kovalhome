@@ -1,7 +1,6 @@
 - name: Provision joplin Proxmox VM
-  hosts: joplin 
+  hosts: joplin
   connection: ansible.builtin.local
-  gather_facts: false
   vars:
     api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
     api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST' ) }}"
