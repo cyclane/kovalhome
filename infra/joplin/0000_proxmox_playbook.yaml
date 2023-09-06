@@ -1,5 +1,5 @@
 - name: Provision joplin Proxmox VM
-  hosts: joplin
+  hosts: localhost
   connection: ansible.builtin.local
   gather_facts: false
   vars:
