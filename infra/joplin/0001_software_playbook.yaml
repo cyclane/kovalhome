@@ -5,19 +5,12 @@
     - name: Debug
       ansible.builtin.debug:
         msg: "{{ inventory_hostname }}"
-    - name: Wut
-      ansible.builtin.shell: |
-        apt update
-        apt install -y iputils-ping
-        ping -c 5 {{ inventory_hostname }}
-      args:
-        executable: /bin/bash
-      delegate_to: localhost
     - name: Wait for connection
       ansible.builtin.wait_for:
         host: "{{ inventory_hostname }}"
         port: 22
         timeout: 300
+      delegate_to: localhost
     - name: Test some stuff
       ansible.builtin.shell: |
         touch ~/hmm
