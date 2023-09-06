@@ -1,12 +1,14 @@
 - name: Provision joplin Proxmox VM
-  hosts: localhost
+  hosts: joplin
+  connection: ansible.builtin.local
+  gather_facts: false
   vars:
     api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
     api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST' ) }}"
     api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
     api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
     ssh_public: "{{ lookup('ansible.builtin.env', 'SSH_PUBLIC') }}"
-    vmname: joplin
+    vmname: "{{ inventory_hostname | regex_replace('^([^\\.]+)\\..+$', '\\1') }}"
     node: pve
   module_defaults:
     community.general.proxmox_kvm:
