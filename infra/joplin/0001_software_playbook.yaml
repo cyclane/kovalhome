@@ -10,8 +10,8 @@
       delegate_to: localhost
     - name: Test some stuff
       ansible.builtin.shell: |
-        apt update
-        apt install -y qemu-guest-agent
+        sudo apt update
+        sudo apt install -y qemu-guest-agent
         touch ~/hmm
         echo test > ~/test
         echo test2 >> ~/test
