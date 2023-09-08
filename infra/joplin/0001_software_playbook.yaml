@@ -10,12 +10,21 @@
       delegate_to: localhost
     - name: Test some stuff
       ansible.builtin.shell: |
-        sudo apt update
-        sudo apt install -y qemu-guest-agent
         touch ~/hmm
         echo test > ~/test
         echo test2 >> ~/test
+        mkdir ~/dir
+        touch ~/dir/testing
       register: stuff
       retries: 10
       delay: 6
       until: stuff.rc == 0
+    - name: Install some stuff
+      ansible.builtin.apt:
+        update_cache: true
+        name: qemu-guest-agent
+    - name: Enable some stuff
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        state: started
+        enabled: true

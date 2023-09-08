@@ -63,7 +63,7 @@
         sshkeys: "{{ ssh_public }}"
         ipconfig:
           ipconfig0: ip=dhcp,ip6=auto
-          ipconfig1: ip=dhcp,ip6=auto
+          ipconfig1: ip=dhcp
         agent: enabled=1
         tags:
           - debian-12
