@@ -8,17 +8,14 @@
         port: 22
         timeout: 300
       delegate_to: localhost
-    - name: Wait for 10s
-      ansible.builtin.wait_for:
-        timeout: 10
-      delegate_to: localhost
-    - name: Ping
-      ansible.builtin.shell: |
-        apt update && apt install -y iputils-ping
-        ping -c 5 {{ inventory_hostname }}
-      delegate_to: localhost
     - name: Test some stuff
       ansible.builtin.shell: |
+        apt update
+        apt install -y qemu-guest-agent
         touch ~/hmm
         echo test > ~/test
         echo test2 >> ~/test
+      retries: 10
+      delay: 6
+      until: result is not failed
+
