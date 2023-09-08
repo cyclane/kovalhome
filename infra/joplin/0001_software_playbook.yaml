@@ -15,7 +15,7 @@
         touch ~/hmm
         echo test > ~/test
         echo test2 >> ~/test
+      register: stuff
       retries: 10
       delay: 6
-      until: result is not failed
-
+      until: stuff.rc == 0
