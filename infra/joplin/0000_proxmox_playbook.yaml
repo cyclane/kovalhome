@@ -36,8 +36,22 @@
         clone: "{{ node }}-debian-12"
         storage: nvme
       register: create
-      notify:
-        - Initial boot
+    - name: Initial boot
+      when: create.changed is true
+      block:
+        - name: Start
+          community.general.proxmox_kvm:
+            state: started
+          register: start
+          retries: 30
+          delay: 10
+          until: start.status is defined
+        - name: Wait
+          ansible.builtin.wait_for:
+            timeout: 180
+        - name: Poweroff
+          community.general.proxmox_kvm:
+            state: stopped
     - name: Debug
       ansible.builtin.debug:
         var: create
@@ -84,19 +98,3 @@
         - create.status != "running"
       community.general.proxmox_kvm:
         state: started
-  handlers:
-    - name: Initial boot
-      block:
-        - name: Start
-          community.general.proxmox_kvm:
-            state: started
-          register: start
-          retries: 30
-          delay: 10
-          until: start.status is defined
-        - name: Wait
-          ansible.builtin.wait_for:
-            timeout: 180
-        - name: Poweroff
-          community.general.proxmox_kvm:
-            state: stopped
