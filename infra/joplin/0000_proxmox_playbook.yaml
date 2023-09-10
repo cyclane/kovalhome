@@ -72,9 +72,6 @@
         - name: Wait # Initial apt update, apt upgrade, cloud-init
           ansible.builtin.wait_for:
             timeout: 180
-        - name: Poweroff
-          community.general.proxmox_kvm:
-            state: stopped
 
     # VM Configuration
     - name: Resize disk
@@ -98,18 +95,7 @@
         cores: 2
         memory: 2048
 
-    # We have now enabled qemu guest agent, but have not installed it
-    # Rebooting will timeout if started
-    - name: Retart VM # doesn't start if stopped
-      when:
-        - vm.status is defined
-        - vm.status == "running"
+    - name: Retart VM
       community.general.proxmox_kvm:
         state: restarted
         timeout: 60
-    - name: Start VM # start if stopped
-      when:
-        - vm.status is defined
-        - vm.status != "running"
-      community.general.proxmox_kvm:
-        state: started

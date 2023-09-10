@@ -4,6 +4,7 @@
   tasks:
     - name: Wait for connection
       ansible.builtin.ping:
+      ignore_unreachable: true
       register: wait_conn
       retries: 30
       delay: 10
