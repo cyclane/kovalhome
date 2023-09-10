@@ -69,9 +69,9 @@
           community.general.proxmox_kvm:
             state: started
           register: start
-        - name: Wait # Initial apt update, apt upgrade, cloud-init
+        - name: Wait 3 min # Initial apt update, apt upgrade, cloud-init
           ansible.builtin.wait_for:
-            timeout: 90
+            timeout: 180
 
     # VM Configuration
     - name: Resize disk
