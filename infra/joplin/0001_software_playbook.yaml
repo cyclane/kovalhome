@@ -3,11 +3,16 @@
   gather_facts: false
   tasks:
     - name: Wait for connection
-      ansible.builtin.wait_for:
-        host: "{{ inventory_hostname }}"
-        port: 22
-        timeout: 300
-      delegate_to: localhost
+      ansible.builtin.ping:
+      register: wait_conn
+      retries: 30
+      delay: 10
+      until: wait_conn.ping is defined
+      # ansible.builtin.wait_for:
+      #   host: "{{ inventory_hostname }}"
+      #   port: 22
+      #   timeout: 300
+      # delegate_to: localhost
     - name: Test some stuff
       ansible.builtin.shell: |
         touch ~/hmm
@@ -15,10 +20,6 @@
         echo test2 >> ~/test
         mkdir ~/dir
         touch ~/dir/testing
-      register: stuff
-      retries: 10
-      delay: 6
-      until: stuff.rc == 0
     - name: Install some stuff
       ansible.builtin.apt:
         update_cache: true
