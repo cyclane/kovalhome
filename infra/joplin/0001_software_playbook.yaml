@@ -9,6 +9,7 @@
       retries: 30
       delay: 10
       until: wait_conn.ping is defined
+      failed_when: wait_conn.ping is not defined
       # ansible.builtin.wait_for:
       #   host: "{{ inventory_hostname }}"
       #   port: 22
