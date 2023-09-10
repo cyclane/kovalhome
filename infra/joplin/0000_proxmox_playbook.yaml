@@ -35,6 +35,10 @@
       community.general.proxmox_kvm:
         clone: "{{ node }}-debian-12"
         storage: nvme
+      register: create
+    - name: Debug
+      ansible.builtin.debug:
+        var: create
     - name: Wait for VM to exist
       community.general.proxmox_kvm:
         state: current
