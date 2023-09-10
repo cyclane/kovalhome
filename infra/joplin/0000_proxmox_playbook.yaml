@@ -36,16 +36,11 @@
         clone: "{{ node }}-debian-12"
         storage: nvme
       register: create
+      notify:
+        - Initial boot
     - name: Debug
       ansible.builtin.debug:
         var: create
-    - name: Wait for VM to exist
-      community.general.proxmox_kvm:
-        state: current
-      register: vm
-      retries: 30
-      delay: 10
-      until: vm.status is defined
     - name: Add HOME NIC
       community.general.proxmox_nic:
         interface: net0
@@ -78,14 +73,30 @@
         memory: 2048
     - name: Retart VM # doesn't start if stopped
       when:
-        - vm.status is defined
-        - vm.status == "running"
+        - create.status is defined
+        - create.status == "running"
       community.general.proxmox_kvm:
         state: restarted
         timeout: 60
     - name: Start VM # start if stopped
       when:
-        - vm.status is defined
-        - vm.status != "running"
+        - create.status is defined
+        - create.status != "running"
       community.general.proxmox_kvm:
         state: started
+  handlers:
+    - name: Initial boot
+      block:
+        - name: Start
+          community.general.proxmox_kvm:
+            state: started
+          register: start
+          retries: 30
+          delay: 10
+          until: start.status is defined
+        - name: Wait
+          ansible.builtin.wait_for:
+            timeout: 180
+        - name: Poweroff
+          community.general.proxmox_kvm:
+            state: stopped
