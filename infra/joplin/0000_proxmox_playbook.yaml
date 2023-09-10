@@ -71,7 +71,7 @@
           register: start
         - name: Wait # Initial apt update, apt upgrade, cloud-init
           ansible.builtin.wait_for:
-            timeout: 180
+            timeout: 90
 
     # VM Configuration
     - name: Resize disk

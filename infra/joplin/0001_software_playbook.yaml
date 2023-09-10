@@ -16,8 +16,10 @@
       ansible.builtin.apt:
         update_cache: true
         name: qemu-guest-agent
+      become: true
     - name: Enable some stuff
       ansible.builtin.systemd:
         name: qemu-guest-agent
         state: started
         enabled: true
+      become: true
