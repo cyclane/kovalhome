@@ -3,21 +3,8 @@
   gather_facts: false
   tasks:
     - name: Wait for connection
-      ansible.builtin.ping:
-      ignore_unreachable: true
-      register: wait_conn
-      retries: 30
-      delay: 10
-      until: wait_conn.ping is defined
-      failed_when: wait_conn.ping is not defined
-      # ansible.builtin.wait_for:
-      #   host: "{{ inventory_hostname }}"
-      #   port: 22
-      #   timeout: 300
-      # delegate_to: localhost
-    - name: Debug
-      ansible.builtin.debug:
-        var: wait_conn
+      ansible.builtin.wait_for_connection:
+        timeout: 300
     - name: Test some stuff
       ansible.builtin.shell: |
         touch ~/hmm
