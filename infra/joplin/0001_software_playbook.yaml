@@ -14,6 +14,9 @@
       #   port: 22
       #   timeout: 300
       # delegate_to: localhost
+    - name: Debug
+      ansible.builtin.debug:
+        var: wait_conn
     - name: Test some stuff
       ansible.builtin.shell: |
         touch ~/hmm
