@@ -15,7 +15,6 @@
     - name: Install some stuff
       ansible.builtin.apt:
         update_cache: true
-        lock_timeout: 120
         name: qemu-guest-agent
       become: true
     - name: Enable some stuff

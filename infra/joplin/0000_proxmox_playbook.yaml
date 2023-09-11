@@ -57,22 +57,6 @@
         firewall: false
         bridge: SRV
 
-    # Initial boot
-    # For some reason debian cloud images don't use
-    # cloud-init for networking on first boot (cloud-init files
-    # are regenerated AFTER networking starts). But we need the
-    # hostname to be registered with DHCP later on so ¯\_(ツ)_/¯
-    - name: Initial boot
-      when: create.changed is true
-      block:
-        - name: Start
-          community.general.proxmox_kvm:
-            state: started
-          register: start
-        - name: Wait 3 min # Initial apt update, apt upgrade, cloud-init
-          ansible.builtin.wait_for:
-            timeout: 180
-
     # VM Configuration
     - name: Resize disk
       community.general.proxmox_disk:
@@ -94,6 +78,22 @@
         onboot: true
         cores: 2
         memory: 2048
+
+    # Initial boot
+    # For some reason debian cloud images don't use
+    # cloud-init for networking on first boot (cloud-init files
+    # are regenerated AFTER networking starts). But we need the
+    # hostname to be registered with DHCP later on so ¯\_(ツ)_/¯
+    - name: Initial boot
+      when: create.changed is true
+      block:
+        - name: Start
+          community.general.proxmox_kvm:
+            state: started
+          register: start
+        - name: Wait 3 min # Initial apt update, apt upgrade, cloud-init
+          ansible.builtin.wait_for:
+            timeout: 180
 
     - name: Retart VM
       community.general.proxmox_kvm:
