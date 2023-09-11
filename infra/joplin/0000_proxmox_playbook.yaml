@@ -89,6 +89,7 @@
         state: resized
     - name: Update VM
       community.general.proxmox_kvm:
+        update: true
         agent: enabled=1
         tags:
           - debian-12
