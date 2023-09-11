@@ -45,7 +45,7 @@
       delay: 10
       until: vm.status is defined
 
-    # Networking
+    # Networking and initial config
     - name: Add HOME NIC
       community.general.proxmox_nic:
         interface: net0
@@ -56,14 +56,7 @@
         interface: net1
         firewall: false
         bridge: SRV
-
-    # VM Configuration
-    - name: Resize disk
-      community.general.proxmox_disk:
-        disk: scsi0
-        size: 64G
-        state: resized
-    - name: Update VM
+    - name: Configure cloud-init
       community.general.proxmox_kvm:
         update: true
         ciuser: debian
@@ -71,13 +64,6 @@
         ipconfig:
           ipconfig0: ip=dhcp,ip6=auto
           ipconfig1: ip=dhcp
-        agent: enabled=1
-        tags:
-          - debian-12
-          - managed
-        onboot: true
-        cores: 2
-        memory: 2048
 
     # Initial boot
     # For some reason debian cloud images don't use
@@ -94,6 +80,22 @@
         - name: Wait 3 min # Initial apt update, apt upgrade, cloud-init
           ansible.builtin.wait_for:
             timeout: 180
+
+    # VM Configuration
+    - name: Resize disk
+      community.general.proxmox_disk:
+        disk: scsi0
+        size: 64G
+        state: resized
+    - name: Update VM
+      community.general.proxmox_kvm:
+        agent: enabled=1
+        tags:
+          - debian-12
+          - managed
+        onboot: true
+        cores: 2
+        memory: 2048
 
     - name: Retart VM
       community.general.proxmox_kvm:
