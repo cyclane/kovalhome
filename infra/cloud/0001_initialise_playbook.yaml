@@ -1,0 +1,48 @@
+- name: Initialise VM
+  hosts: cloud
+  gather_facts: false
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+    - name: Install system packages
+      ansible.builtin.apt:
+        update_cache: true
+        pkg:
+          - qemu-guest-agent
+          - parted
+      become: true
+    - name: Enable qemu-guest-agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        state: started
+        enabled: true
+      become: true
+
+    - name: Create data partition
+      community.general.parted:
+        device: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:1
+        label: gpt
+        name: data
+        number: 1
+        state: present
+      become: true
+    - name: Create data filesystem
+      community.general.filesystem:
+        dev: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:1-part1
+        fstype: ext4
+      become: true
+    - name: Mount data partition
+      ansible.posix.mount:
+        src: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:1-part1
+        path: /mnt/data
+        fstype: ext4
+        opts: rw,errors=remount-ro,x-systemd.growfs
+        state: mounted
+      become: true
+    - name: Set data partition permissions
+      ansible.builtin.file:
+        path: /mnt/data
+        owner: debian
+        group: debian
+      become: true

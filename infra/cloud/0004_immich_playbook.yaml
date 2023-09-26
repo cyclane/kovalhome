@@ -1,0 +1,27 @@
+- name: Deploy app
+  hosts: cloud
+  gather_facts: false
+  vars:
+    app: immich
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+    - name: Get user
+      ansible.builtin.user:
+        name: debian
+      register: user
+    # - name: Docker compose down
+    #   ansible.builtin.command: docker compose down
+    #   args:
+    #     chdir: "{{ user.home }}/{{ app }}"
+    #   ignore_errors: true
+    # - name: Copy project
+    #   ansible.builtin.copy:
+    #     src: ./{{ app }}
+    #     dest: "{{ user.home }}"
+    #     mode: "0744"
+    # - name: Docker compose up -d
+    #   ansible.builtin.command: docker compose up -d
+    #   args:
+    #     chdir: "{{ user.home }}/{{ app }}"

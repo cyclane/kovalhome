@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - infra/**-playbook.yaml
+      - infra/**playbook.yaml
       - .github/workflows/infra.yaml
   push:
     branches:
@@ -23,20 +23,17 @@ jobs:
         with:
           fetch-depth: ${{ env.DEPLOY == 'some' && 2 || 1 }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
       - name: Install dependencies
         run: |
+          apt update
+          apt install -y python3-pip
           pip3 install -r requirements.txt
           ansible-galaxy collection install community.general
 
       - name: Check playbooks
         run: |
-          for file in $(find . -wholename "*/infra/*-playbook.yaml" -type f); do
-            ansible-playbook --inventory ./inventory --check "$file"
+          for file in $(find . -wholename "*/infra/*playbook.yaml" -type f); do
+            ansible-playbook --inventory ./inventory --syntax-check "$file"
           done
 
       - name: Get changed playbooks
@@ -44,7 +41,7 @@ jobs:
         if: env.DEPLOY == 'some'
         uses: tj-actions/changed-files@v38
         with:
-          files: infra/**/*-playbook.yaml
+          files: infra/**/*playbook.yaml
 
       - name: Get playbooks
         id: playbooks
@@ -53,11 +50,18 @@ jobs:
           if [[ "${{ env.DEPLOY }}" == "some" ]]; then
             export TO_RUN="${{ steps.files.outputs.all_changed_files }}"
           else
-            export TO_RUN="$(find . -wholename './infra/*-playbook.yaml' -type f)"
+            export TO_RUN="$(find . -wholename './infra/*playbook.yaml' -type f)"
           fi
           export TO_RUN="$( echo -n $TO_RUN | tr ' ' '\n' | sort | tr '\n' ' ' )" # run things in order :)
           echo "will run playbooks: $TO_RUN"
           echo "to_run=$TO_RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Setup environment
+        if: env.DEPLOY != 'none' && steps.playbooks.outputs.to_run != ''
+        run: |
+          mkdir -p -m 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Run playbooks
         if: env.DEPLOY != 'none' && steps.playbooks.outputs.to_run != ''
@@ -66,4 +70,5 @@ jobs:
           PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
           PROXMOX_TOKEN_ID: ${{ secrets.PROXMOX_TOKEN_ID }}
           PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
-        run: ansible-playbook --inventory ./inventory ${{ steps.playbooks.outputs.to_run }}
+          SSH_PUBLIC: ${{ secrets.SSH_PUBLIC }}
+        run: ansible-playbook --inventory ./inventory ${{ steps.playbooks.outputs.to_run }} -vv
