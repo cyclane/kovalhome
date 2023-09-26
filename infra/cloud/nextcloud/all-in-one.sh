@@ -9,7 +9,6 @@ docker run \
 --name nextcloud-aio-mastercontainer \
 --restart unless-stopped \
 --publish 8080:8080 \
---env NEXTCLOUD_DATADIR=/mnt/data/nextcloud \
 --env NEXTCLOUD_UPLOAD_LIMIT=16G \
 --env NEXTCLOUD_MAX_TIME=7200 \
 --env APACHE_PORT=11000 \
