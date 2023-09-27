@@ -13,7 +13,7 @@
       register: user
     - name: Copy project
       ansible.builtin.copy:
-        src: ./{{ app }}
+        src: "./{{ app }}"
         dest: "{{ user.home }}"
         mode: "0744"
     - name: Re-deploy
