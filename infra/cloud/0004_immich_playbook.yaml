@@ -11,17 +11,17 @@
       ansible.builtin.user:
         name: debian
       register: user
-    # - name: Docker compose down
-    #   ansible.builtin.command: docker compose down
-    #   args:
-    #     chdir: "{{ user.home }}/{{ app }}"
-    #   ignore_errors: true
-    # - name: Copy project
-    #   ansible.builtin.copy:
-    #     src: ./{{ app }}
-    #     dest: "{{ user.home }}"
-    #     mode: "0744"
-    # - name: Docker compose up -d
-    #   ansible.builtin.command: docker compose up -d
-    #   args:
-    #     chdir: "{{ user.home }}/{{ app }}"
+    - name: Docker compose down
+      ansible.builtin.command: docker compose down
+      args:
+        chdir: "{{ user.home }}/{{ app }}"
+      ignore_errors: true
+    - name: Copy project
+      ansible.builtin.copy:
+        src: ./{{ app }}
+        dest: "{{ user.home }}"
+        mode: "0744"
+    - name: Docker compose up -d
+      ansible.builtin.command: docker compose up -d
+      args:
+        chdir: "{{ user.home }}/{{ app }}"

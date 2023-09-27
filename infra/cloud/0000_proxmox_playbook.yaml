@@ -93,6 +93,12 @@
         backup: true
         storage: nvme
         size: 2048
+    - name: Create media disk
+      community.general.proxmox_disk:
+        disk: scsi2
+        backup: false
+        storage: zfs
+        size: 4096
     - name: Update VM
       community.general.proxmox_kvm:
         update: true

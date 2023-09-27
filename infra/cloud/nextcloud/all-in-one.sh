@@ -11,6 +11,7 @@ docker run \
 --publish 8080:8080 \
 --env NEXTCLOUD_UPLOAD_LIMIT=16G \
 --env NEXTCLOUD_MAX_TIME=7200 \
+--env NEXTCLOUD_ADDITIONAL_APKS="imagemagick ffmpeg" \
 --env APACHE_PORT=11000 \
 --env APACHE_IP_BINDING=0.0.0.0 \
 --env TZ=Europe/London \

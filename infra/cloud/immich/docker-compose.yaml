@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   immich-server:
@@ -36,7 +36,7 @@ services:
     container_name: immich_machine_learning
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
     volumes:
-      - /mnt/data/immich-model-cache:/cache
+      - model-cache:/cache
     env_file:
       - .env
     restart: always
@@ -57,7 +57,7 @@ services:
       # remove this to get debug messages
       - GLOG_minloglevel=1
     volumes:
-      - /mnt/data/immich-typesense:/data
+      - tsdata:/data
     restart: always
 
   redis:
@@ -75,7 +75,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_DATABASE_NAME}
     volumes:
-      - /mnt/data/immich-pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     restart: always
 
   immich-proxy:
@@ -91,3 +91,8 @@ services:
       - immich-server
       - immich-web
     restart: always
+
+volumes:
+  pgdata:
+  model-cache:
+  tsdata:
