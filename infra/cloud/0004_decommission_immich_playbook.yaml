@@ -1,0 +1,71 @@
+- name: Decommission Immich
+  hosts: cloud
+  gather_facts: false
+  vars:
+    app: immich
+    api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+    api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST' ) }}"
+    api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+    api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+    vmname: "{{ inventory_hostname | regex_replace('^([^\\.]+)\\..+$', '\\1') }}"
+    node: pve
+  module_defaults:
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+      node: "{{ node }}"
+    community.general.proxmox_disk:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+    - name: Get user
+      ansible.builtin.user:
+        name: debian
+      register: user
+    - name: Docker compose down
+      ansible.builtin.command: docker compose down
+      args:
+        chdir: "{{ user.home }}/{{ app }}"
+      ignore_errors: true
+    - name: Remove docker volumes
+      ansible.builtin.command: docker compose down --volumes
+      args:
+        chdir: "{{ user.home }}/{{ app }}"
+      ignore_errors: true
+    - name: Remove config directory
+      ansible.builtin.file:
+        path: "{{ user.home }}/{{ app }}"
+        state: absent
+
+    - name: Destroy media disk
+      community.general.proxmox_disk:
+        disk: scsi2
+        state: absent
+      delegate_to: localhost
+    - name: Remove media mount
+      ansible.posix.mount:
+        src: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:2-part1
+        path: /mnt/media
+        fstype: ext4
+        opts: rw,errors=remount-ro,x-systemd.growfs
+        state: absent
+      become: true
+    - name: Remove media directory
+      ansible.builtin.file:
+        path: /mnt/media
+        state: absent
+      become: true
+    - name: Restart VM
+      community.general.proxmox_kvm:
+        state: restarted
+        timeout: 60
+      delegate_to: localhost

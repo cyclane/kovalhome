@@ -1,5 +1,5 @@
 - name: Deploy app
-  hosts: cloud
+  hosts: photos 
   gather_facts: false
   vars:
     app: immich
@@ -21,6 +21,16 @@
         src: "./{{ app }}"
         dest: "{{ user.home }}"
         mode: "0744"
+    - name: Replace Typesense secret
+      ansible.builtin.replace:
+        path: "{{ user.home }}/{{ app }}/.env"
+        regexp: "TYPESENSE_API_KEY_VALUE"
+        replace: "{{ lookup('ansible.builtin.password', user.home + '/typesense_secret', length=64, chars=['ascii_letters', 'digits']) }}"
+    - name: Replace DB secret
+      ansible.builtin.replace:
+        path: "{{ user.home }}/{{ app }}/.env"
+        regexp: "DB_PASSWORD_VALUE"
+        replace: "{{ lookup('ansible.builtin.password', user.home + '/db_secret', length=64, chars=['ascii_letters', 'digits']) }}"
     - name: Docker compose up -d
       ansible.builtin.command: docker compose up -d
       args:

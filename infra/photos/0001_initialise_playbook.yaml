@@ -1,5 +1,5 @@
 - name: Initialise VM
-  hosts: cloud
+  hosts: photos
   gather_facts: false
   tasks:
     - name: Wait for connection
@@ -36,6 +36,28 @@
       ansible.posix.mount:
         src: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:1-part1
         path: /var/lib/docker
+        fstype: ext4
+        opts: rw,errors=remount-ro,x-systemd.growfs
+        state: mounted
+      become: true
+
+    - name: Create media partition
+      community.general.parted:
+        device: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:2
+        label: gpt
+        name: media
+        number: 1
+        state: present
+      become: true
+    - name: Create media filesystem
+      community.general.filesystem:
+        dev: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:2-part1
+        fstype: ext4
+      become: true
+    - name: Mount media partition
+      ansible.posix.mount:
+        src: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:2-part1
+        path: /mnt/media
         fstype: ext4
         opts: rw,errors=remount-ro,x-systemd.growfs
         state: mounted

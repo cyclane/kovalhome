@@ -1,5 +1,5 @@
-- name: Provision cloud Proxmox VM
-  hosts: cloud
+- name: Provision photos Proxmox VM
+  hosts: photos
   connection: ansible.builtin.local
   gather_facts: false
   vars:
@@ -90,6 +90,12 @@
     - name: Create data disk
       community.general.proxmox_disk:
         disk: scsi1
+        backup: true
+        storage: nvme
+        size: 64
+    - name: Create media disk
+      community.general.proxmox_disk:
+        disk: scsi2
         backup: true
         storage: nvme
         size: 2048
