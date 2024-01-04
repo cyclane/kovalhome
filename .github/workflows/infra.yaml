@@ -29,7 +29,7 @@ jobs:
           apt update
           apt install -y python3-pip
           pip3 install -r requirements.txt
-          ansible-galaxy collection install community.general
+          ansible-galaxy collection install community.general infisical.vault
 
       - name: Check playbooks
         run: |
@@ -76,4 +76,6 @@ jobs:
           INFISICAL_ENCRYPTION_KEY: ${{ secrets.INFISICAL_ENCRYPTION_KEY }}
           INFISICAL_AUTH_SECRET: ${{ secrets.INFISICAL_AUTH_SECRET }}
           INFISICAL_MONGO_PASSWORD: ${{ secrets.INFISICAL_MONGO_PASSWORD }}
+          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
+          INFISICAL_URL: https://secrets.koval.net
         run: ansible-playbook --inventory ./inventory ${{ steps.playbooks.outputs.to_run }} -vv
