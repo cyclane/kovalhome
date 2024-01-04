@@ -25,12 +25,12 @@
       ansible.builtin.replace:
         path: "{{ user.home }}/{{ app }}/.env"
         regexp: "TYPESENSE_API_KEY_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/photos', secret_name='TYPESENSE_API_KEY') }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/photos', secret_name='TYPESENSE_API_KEY')['value'] }}"
     - name: Replace DB secret
       ansible.builtin.replace:
         path: "{{ user.home }}/{{ app }}/.env"
         regexp: "DB_PASSWORD_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/photos', secret_name='DB_PASSWORD') }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/photos', secret_name='DB_PASSWORD')['value'] }}"
     - name: Docker compose up -d
       ansible.builtin.command: docker compose up -d
       args:
