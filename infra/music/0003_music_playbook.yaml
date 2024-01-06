@@ -55,6 +55,7 @@
         recurse: yes
         owner: debian
         group: debian
+      become: true
 
     - name: Update media permissions
       ansible.builtin.file:
@@ -63,3 +64,4 @@
         recurse: yes
         owner: debian
         group: debian
+      become: true
