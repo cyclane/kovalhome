@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    restart: unless-stopped
+    user: 1000:1000
+    ports:
+      - 4533:4533
+    env_file: .env
+    environment:
+      - ND_BASEURL=https://music.koval.net
+      - ND_LASTFM_APIKEY=${LASTFM_APIKEY}
+      - ND_LASTFM_SECRET=${LASTFM_SECRET}
+      - ND_SPOTIFY_ID=${SPOTIFY_ID}
+      - ND_SPOTIFY_SECRET=${SPOTIFY_SECRET}
+    volumes:
+      - /mnt/nvme/navidrome:/data
+      - /mnt/media/music:/music:ro
+  metube:
+    image: ghcr.io/alexta69/metube
+    restart: unless-stopped
+    user: 1000:1000
+    ports:
+      - 8081:8081
+    environment:
+      - STATE_DIR=/data/.metube
+      - TEMP_DIR=/data/downloads
+    volumes:
+      - /mnt/nvme/metube:/data
+      - /mnt/media/downloads:/downloads
+  picard:
+    image: mikenye/picard:latest
+    restart: unless-stopped
+    user: 1000:1000
+    ports:
+      - 5800:5800
+    volumes:
+      - /mnt/nvme/picard:/config:rw
+      - /mnt/media/music:/storage/music:rw
+      - /mnt/media/downloads:/storage/downloads:rw
+  filebrowser:
+    image: filebrowser/filebrowser
+    restart: unless-stopped
+    user: 1000:1000
+    ports:
+      - 8080:80
+    environment:
+      - FB_DATABASE=/config/database.db
+    volumes:
+      - /mnt/nvme/filebrowser:/config
+      - /mnt/media/downloads:/srv/downloads
+      - /mnt/media/music:/srv/music

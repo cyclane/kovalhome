@@ -1,0 +1,116 @@
+- name: Provision music Proxmox VM
+  hosts: music
+  connection: ansible.builtin.local
+  gather_facts: false
+  vars:
+    api_user: "{{ lookup('ansible.builtin.env', 'PROXMOX_USER') }}"
+    api_host: "{{ lookup('ansible.builtin.env', 'PROXMOX_HOST' ) }}"
+    api_token_id: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_ID') }}"
+    api_token_secret: "{{ lookup('ansible.builtin.env', 'PROXMOX_TOKEN_SECRET') }}"
+    ssh_public: "{{ lookup('ansible.builtin.env', 'SSH_PUBLIC') }}"
+    vmname: "{{ inventory_hostname | regex_replace('^([^\\.]+)\\..+$', '\\1') }}"
+    node: pve2
+  module_defaults:
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+      node: "{{ node }}"
+    community.general.proxmox_nic:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+    community.general.proxmox_disk:
+      api_user: "{{ api_user }}"
+      api_host: "{{ api_host }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      name: "{{ vmname }}"
+  tasks:
+    # Initial setup
+    - name: Create VM
+      community.general.proxmox_kvm:
+        clone: "{{ node }}-debian-12"
+        storage: nvme
+      register: create
+    - name: Wait for status
+      community.general.proxmox_kvm:
+        state: current
+      register: vm
+      retries: 30
+      delay: 10
+      until: vm.status is defined
+
+    # Networking and initial config
+    - name: Add PUB NIC
+      community.general.proxmox_nic:
+        interface: net0
+        firewall: false
+        bridge: PUB
+    - name: Add SRV NIC
+      community.general.proxmox_nic:
+        interface: net1
+        firewall: false
+        bridge: SRV
+    - name: Configure cloud-init
+      community.general.proxmox_kvm:
+        update: true
+        ciuser: debian
+        sshkeys: "{{ ssh_public }}"
+        ipconfig:
+          ipconfig0: ip=dhcp,ip6=auto
+          ipconfig1: ip=dhcp
+
+    # Initial boot
+    # For some reason debian cloud images don't use
+    # cloud-init for networking on first boot (cloud-init files
+    # are regenerated AFTER networking starts). But we need the
+    # hostname to be registered with DHCP later on so ¯\_(ツ)_/¯
+    - name: Initial boot
+      when: create.changed is true
+      block:
+        - name: Start
+          community.general.proxmox_kvm:
+            state: started
+          register: start
+        - name: Wait 1.5 min # Initial apt update, apt upgrade, cloud-init
+          ansible.builtin.wait_for:
+            timeout: 90
+
+    # VM Configuration
+    - name: Resize root disk
+      community.general.proxmox_disk:
+        disk: scsi0
+        size: 16G
+        state: resized
+    - name: Create data disk
+      community.general.proxmox_disk:
+        disk: scsi1
+        backup: true
+        storage: nvme
+        size: 64
+    - name: Create media disk
+      community.general.proxmox_disk:
+        disk: scsi2
+        backup: false
+        storage: nvme
+        size: 1024
+    - name: Update VM
+      community.general.proxmox_kvm:
+        update: true
+        agent: enabled=1
+        tags:
+          - debian-12
+          - managed
+        onboot: true
+        cores: 8
+        memory: 16384
+
+    - name: Retart VM
+      community.general.proxmox_kvm:
+        state: restarted
+        timeout: 60
