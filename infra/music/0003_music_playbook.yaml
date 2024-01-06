@@ -52,7 +52,7 @@
       ansible.builtin.file:
         path: /mnt/nvme
         state: directory
-        recurse: yes
+        recurse: true
         owner: debian
         group: debian
       become: true
@@ -61,7 +61,7 @@
       ansible.builtin.file:
         path: /mnt/media
         state: directory
-        recurse: yes
+        recurse: true
         owner: debian
         group: debian
       become: true
