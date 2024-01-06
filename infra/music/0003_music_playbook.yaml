@@ -47,3 +47,19 @@
       ansible.builtin.command: docker compose up -d
       args:
         chdir: "{{ user.home }}/{{ app }}"
+
+    - name: Update data permissions
+      ansible.builtin.file:
+        path: /mnt/nvme
+        state: directory
+        recurse: yes
+        owner: debian
+        group: debian
+
+    - name: Update media permissions
+      ansible.builtin.file:
+        path: /mnt/media
+        state: directory
+        recurse: yes
+        owner: debian
+        group: debian
