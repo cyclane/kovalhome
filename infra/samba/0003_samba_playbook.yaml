@@ -33,3 +33,12 @@
       ansible.builtin.command: docker compose up -d
       args:
         chdir: "{{ user.home }}/{{ app }}"
+
+    - name: Update samba permissions
+      ansible.builtin.file:
+        path: /mnt/share/samba
+        state: directory
+        recurse: true
+        owner: debian
+        group: debian
+      become: true
