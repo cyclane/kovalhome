@@ -51,6 +51,11 @@
         interface: net0
         firewall: false
         bridge: PUB
+    - name: Add SRV NIC
+      community.general.proxmox_nic:
+        interface: net1
+        firewall: false
+        bridge: SRV
     - name: Configure cloud-init
       community.general.proxmox_kvm:
         update: true
@@ -58,6 +63,7 @@
         sshkeys: "{{ ssh_public }}"
         ipconfig:
           ipconfig0: ip=dhcp,ip6=auto
+          ipconfig1: ip=dhcp
 
     # Initial boot
     # For some reason debian cloud images don't use
