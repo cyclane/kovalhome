@@ -1,0 +1,47 @@
+- name: Install software
+  hosts: samba
+  gather_facts: false
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+    - name: Install dependencies
+      ansible.builtin.apt:
+        update_cache: true
+        pkg:
+          - curl
+          - python3-apt
+          - gpg
+      become: true
+    - name: Add docker key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        keyring: /etc/apt/keyrings/docker.gpg
+      become: true
+    - name: Add docker repo
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable
+      become: true
+    - name: Install docker
+      ansible.builtin.apt:
+        update_cache: true
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+      become: true
+    - name: Add user to docker group
+      ansible.builtin.user:
+        user: debian
+        groups:
+          - docker
+        append: true
+      become: true
+    - name: Enable docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+      become: true

@@ -1,0 +1,26 @@
+auth:
+  - user: debian
+    group: debian
+    uid: 1000
+    gid: 1000
+
+  - user: kvk
+    group: kvk
+    uid: 1001
+    gid: 1001
+    password: KVK_PASSWORD
+
+global:
+  - "force user = debian"
+  - "force group = debian"
+
+share:
+  - name: kvkbackups 
+    comment: KVK Backups
+    path: /samba/kvkbackups
+    validusers: kvk
+    writelist: kvk
+    browsable: yes
+    readonly: no
+    guestok: no
+    veto: no

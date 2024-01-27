@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  samba:
+    image: crazymax/samba
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - samba-data:/data
+      - ./config.yml:/data/config.yml
+      - /mnt/share/samba:/samba
+    environment:
+      - TZ=Europe/London
+
+volumes:
+  samba-data:
