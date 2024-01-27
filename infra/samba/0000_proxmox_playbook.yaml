@@ -109,7 +109,6 @@
         onboot: true
         cores: 4
         memory: 8192
-
     - name: Retart VM
       community.general.proxmox_kvm:
         state: restarted
