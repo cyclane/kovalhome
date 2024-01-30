@@ -15,12 +15,12 @@ global:
   - "force group = debian"
 
 share:
-  - name: kvkbackups 
+  - name: kvkbackups
     comment: KVK Backups
     path: /samba/kvkbackups
     validusers: kvk
     writelist: kvk
-    browsable: yes
-    readonly: no
-    guestok: no
-    veto: no
+    browsable: true
+    readonly: false
+    guestok: false
+    veto: false

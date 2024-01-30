@@ -31,9 +31,8 @@ jobs:
           pip3 install -r requirements.txt
           ansible-galaxy collection install community.general community.docker infisical.vault --force
 
-      - name: Ansible lint
-        run: |
-          ansible-lint -s -x args[module] infra/**/*playbook.yaml
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v6
 
       - name: Check playbooks
         run: |
