@@ -2,5 +2,3 @@ strict: true
 use_default_rules: true
 skip_list:
   - args[module]
-exclude_paths:
-  - "!infra/**/*playbook.yaml"
