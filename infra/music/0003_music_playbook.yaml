@@ -7,46 +7,39 @@
     - name: Wait for connection
       ansible.builtin.wait_for_connection:
         timeout: 300
-    - name: Get user
-      ansible.builtin.user:
-        name: debian
-      register: user
     - name: Docker compose down
-      ansible.builtin.command: docker compose down
-      args:
-        chdir: "{{ user.home }}/{{ app }}"
-      ignore_errors: true
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"
+        state: absent
     - name: Copy project
       ansible.builtin.copy:
         src: "./{{ app }}"
-        dest: "{{ user.home }}"
+        dest: "$HOME"
         mode: "0744"
-
     - name: Replace LastFM API key secret
       ansible.builtin.replace:
-        path: "{{ user.home }}/{{ app }}/.env"
+        path: "$HOME/{{ app }}/.env"
         regexp: "LASTFM_APIKEY_VALUE"
         replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='LASTFM_APIKEY')['value'] }}"
     - name: Replace LastFM secret
       ansible.builtin.replace:
-        path: "{{ user.home }}/{{ app }}/.env"
+        path: "$HOME/{{ app }}/.env"
         regexp: "LASTFM_SECRET_VALUE"
         replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='LASTFM_SECRET')['value'] }}"
     - name: Replace Mongo Password secret
       ansible.builtin.replace:
-        path: "{{ user.home }}/{{ app }}/.env"
+        path: "$HOME/{{ app }}/.env"
         regexp: "SPOTIFY_ID_VALUE"
         replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='SPOTIFY_ID')['value'] }}"
     - name: Replace SMTP Password secret
       ansible.builtin.replace:
-        path: "{{ user.home }}/{{ app }}/.env"
+        path: "$HOME/{{ app }}/.env"
         regexp: "SPOTIFY_SECRET_VALUE"
         replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='SPOTIFY_SECRET')['value'] }}"
 
-    - name: Docker compose up -d
-      ansible.builtin.command: docker compose up -d
-      args:
-        chdir: "{{ user.home }}/{{ app }}"
+    - name: Docker compose up
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"
 
     - name: Update data permissions
       ansible.builtin.file:
