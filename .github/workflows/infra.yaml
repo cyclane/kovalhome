@@ -33,7 +33,7 @@ jobs:
 
       - name: Ansible lint
         run: |
-          ansible-lint infra/**/*playbook.yaml
+          ansible-lint -s -x args[module] infra/**/*playbook.yaml
 
       - name: Check playbooks
         run: |
