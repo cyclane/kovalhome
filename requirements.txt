@@ -1,5 +1,4 @@
 ansible
-ansible-lint
 proxmoxer
 requests
 infisical
