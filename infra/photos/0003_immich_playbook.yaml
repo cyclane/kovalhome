@@ -11,7 +11,6 @@
       ansible.builtin.user:
         name: debian
       register: user
-
     - name: Docker compose down
       ansible.builtin.command: docker compose down
       args:
