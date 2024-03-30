@@ -37,7 +37,7 @@
         clone: "{{ node }}-debian-12"
         storage: nvme
       notify:
-        - Start vm
+        - Start VM
         - Wait
     - name: Wait for status
       community.general.proxmox_kvm:
