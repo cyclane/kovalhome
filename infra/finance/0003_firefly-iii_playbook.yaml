@@ -7,6 +7,7 @@
     - name: Wait for connection
       ansible.builtin.wait_for_connection:
         timeout: 300
+
     - name: Check if project exists
       ansible.builtin.stat:
         path: "$HOME/{{ app }}"
