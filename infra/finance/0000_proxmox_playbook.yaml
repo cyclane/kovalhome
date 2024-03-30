@@ -37,7 +37,8 @@
         clone: "{{ node }}-debian-12"
         storage: nvme
       notify:
-        - Initial boot
+        - Start vm
+        - Wait
     - name: Wait for status
       community.general.proxmox_kvm:
         state: current
@@ -103,12 +104,10 @@
     # cloud-init for networking on first boot (cloud-init files
     # are regenerated AFTER networking starts). But we need the
     # hostname to be registered with DHCP later on so ¯\_(ツ)_/¯
-    - name: Initial boot
-      block:
-        - name: Start
-          community.general.proxmox_kvm:
-            state: started
-          register: start
-        - name: Wait 1.5 min # Initial apt update, apt upgrade, cloud-init
-          ansible.builtin.wait_for:
-            timeout: 90
+    - name: Start VM
+      community.general.proxmox_kvm:
+        state: started
+      register: start
+    - name: Wait # Initial apt update, apt upgrade, cloud-init
+      ansible.builtin.wait_for:
+        timeout: 90
