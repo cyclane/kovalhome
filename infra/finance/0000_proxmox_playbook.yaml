@@ -36,7 +36,8 @@
       community.general.proxmox_kvm:
         clone: "{{ node }}-debian-12"
         storage: nvme
-      notify: Initial boot
+      notify:
+        - Initial boot
     - name: Wait for status
       community.general.proxmox_kvm:
         state: current
