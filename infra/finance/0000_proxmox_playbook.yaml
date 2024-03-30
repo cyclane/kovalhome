@@ -96,6 +96,7 @@
       community.general.proxmox_kvm:
         state: restarted
         timeout: 60
+
   handlers:
     # Initial boot
     # For some reason debian cloud images don't use
