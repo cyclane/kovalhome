@@ -8,7 +8,12 @@
       ansible.builtin.wait_for_connection:
         timeout: 300
 
+    - name: Check if project exists
+      ansible.builtin.stat:
+        path: "$HOME/{{ app }}"
+      register: project
     - name: Docker compose down
+      when: project.stat.exists
       community.docker.docker_compose_v2:
         project_src: "$HOME/{{ app }}"
         state: absent
