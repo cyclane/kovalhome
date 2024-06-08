@@ -36,7 +36,6 @@
       community.general.proxmox_kvm:
         clone: "{{ node }}-base"
         storage: nvme
-      notify: Initial boot
     - name: Wait for status
       community.general.proxmox_kvm:
         state: current
