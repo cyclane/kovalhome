@@ -31,4 +31,7 @@ proxmox:
             ansible_ssh_private_key_file: ~/.ssh/id_rsa
             ansible_ssh_common_args: -o StrictHostKeyChecking=accept-new # TODO: Improve this
         unmanaged:
-          hosts:
+          children:
+            backups:
+              hosts:
+                backups.srv.home.local.koval.net:
