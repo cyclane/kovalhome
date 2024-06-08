@@ -80,8 +80,7 @@
         boot: order=scsi0;ide2
         agent: enabled=1
         tags:
-          - debian-12
-          - managed
+          - provisioned
         onboot: true
         cores: 4
         memory: 4096
