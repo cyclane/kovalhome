@@ -35,3 +35,5 @@ proxmox:
             backups:
               hosts:
                 backups.srv.home.local.koval.net:
+      vars:
+        infisical_project: d102ada3-7d49-4138-9759-033ca79fe731

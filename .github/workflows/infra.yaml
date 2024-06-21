@@ -73,8 +73,7 @@ jobs:
           PROXMOX_TOKEN_SECRET: ${{ secrets.PROXMOX_TOKEN_SECRET }}
           SSH_PUBLIC: ${{ secrets.SSH_PUBLIC }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          INFISICAL_ENCRYPTION_KEY: ${{ secrets.INFISICAL_ENCRYPTION_KEY }}
-          INFISICAL_AUTH_SECRET: ${{ secrets.INFISICAL_AUTH_SECRET }}
-          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
+          UNIVERSAL_AUTH_MACHINE_IDENTITY_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          UNIVERSAL_AUTH_MACHINE_IDENTITY_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
           INFISICAL_URL: https://secrets.koval.net
         run: ansible-playbook --inventory ./inventory ${{ steps.playbooks.outputs.to_run }} -vv
