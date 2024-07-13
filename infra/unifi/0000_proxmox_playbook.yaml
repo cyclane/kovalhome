@@ -72,7 +72,7 @@
         ipconfig:
           ipconfig0: ip=dhcp,ip6=auto
           ipconfig1: ip=dhcp
-          ipconfig1: ip=192.168.1.2/24
+          ipconfig2: ip=192.168.1.2/24
 
     - name: Force all notified handlers to run
       ansible.builtin.meta: flush_handlers
