@@ -104,4 +104,4 @@
       register: start
     - name: Wait # Initial apt update, apt upgrade, cloud-init
       ansible.builtin.wait_for:
-        timeout: 90
+        timeout: 120
