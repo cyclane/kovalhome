@@ -16,7 +16,6 @@
           - ca-certificates
           - curl
       become: true
-
     - name: Enable qemu-guest-agent
       ansible.builtin.systemd:
         name: qemu-guest-agent
