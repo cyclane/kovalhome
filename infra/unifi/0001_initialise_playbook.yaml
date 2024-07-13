@@ -5,6 +5,7 @@
     - name: Wait for connection
       ansible.builtin.wait_for_connection:
         timeout: 300
+
     - name: Install system packages
       ansible.builtin.apt:
         update_cache: true
