@@ -1,0 +1,24 @@
+- name: Initialise VM
+  hosts: unifi
+  gather_facts: false
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Install system packages
+      ansible.builtin.apt:
+        update_cache: true
+        pkg:
+          - qemu-guest-agent
+          - parted
+          # For unifi
+          - ca-certificates
+          - curl
+      become: true
+    - name: Enable qemu-guest-agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        state: started
+        enabled: true
+      become: true
