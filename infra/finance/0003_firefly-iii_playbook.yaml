@@ -60,6 +60,6 @@
         regexp: "SMTP_PASSWORD_VALUE"
         replace: "{{ lookup('ansible.builtin.env', 'SMTP_PASSWORD') }}"
 
-    - name: Docker compose up -d
+    - name: Docker compose up
       community.docker.docker_compose_v2:
         project_src: "$HOME/{{ app }}"
