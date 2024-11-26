@@ -27,17 +27,20 @@
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.env"
         regexp: "APP_KEY_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/finance', secret_name='APP_KEY')['value'] }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/finance', secret_name='APP_KEY')['value'] }}"
     - name: Replace DB secret
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.env"
         regexp: "DB_PASSWORD_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/finance', secret_name='DB_PASSWORD')['value'] }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/finance', secret_name='DB_PASSWORD')['value'] }}"
     - name: Replace cron token secret
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.env"
         regexp: "STATIC_CRON_TOKEN_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/finance', secret_name='STATIC_CRON_TOKEN')['value'] }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/finance', secret_name='STATIC_CRON_TOKEN')['value'] }}"
     - name: Replace SMTP Password secret (app)
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.env"
@@ -48,12 +51,14 @@
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.importer.env"
         regexp: "NORDIGEN_ID_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/finance', secret_name='NORDIGEN_ID')['value'] }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/finance', secret_name='NORDIGEN_ID')['value'] }}"
     - name: Replace Nordigen Key secret
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.importer.env"
         regexp: "NORDIGEN_KEY_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/finance', secret_name='NORDIGEN_KEY')['value'] }}"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/finance', secret_name='NORDIGEN_KEY')['value'] }}"
     - name: Replace SMTP Password secret (importer)
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.importer.env"
