@@ -25,14 +25,14 @@
 
     - name: Replace Typesense secret
       ansible.builtin.replace:
-        path: "{{ user.home }}/{{ app }}/.env"
+        path: "$HOME/{{ app }}/.env"
         regexp: "TYPESENSE_API_KEY_VALUE"
         replace:
           "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
           path='/photos', secret_name='TYPESENSE_API_KEY')['value'] }}"
     - name: Replace DB secret
       ansible.builtin.replace:
-        path: "{{ user.home }}/{{ app }}/.env"
+        path: "$HOME/{{ app }}/.env"
         regexp: "DB_PASSWORD_VALUE"
         replace:
           "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
