@@ -81,7 +81,7 @@
     - name: Resize root disk
       community.general.proxmox_disk:
         disk: scsi0
-        size: 48G
+        size: 128G
         state: resized
     - name: Update VM
       community.general.proxmox_kvm:
