@@ -92,6 +92,7 @@
           - provisioned
         onboot: true
         cores: 4
+        cpu: x86-64-v3
         memory: 8192
 
     - name: Retart VM
