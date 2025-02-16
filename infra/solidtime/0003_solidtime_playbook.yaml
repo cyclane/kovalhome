@@ -52,7 +52,6 @@
         regexp: "DB_PASSWORD_VALUE"
         replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
                             path='/solidtime', secret_name='DB_PASSWORD')['value'] }}"
-
     - name: Replace DB Password secret (db)
       ansible.builtin.replace:
         path: "$HOME/{{ app }}/.env"
