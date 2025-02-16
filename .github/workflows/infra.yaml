@@ -33,9 +33,7 @@ jobs:
 
       - name: Check playbooks
         run: |
-          for file in $(find . -wholename "*/infra/*playbook.yaml" -type f); do
-            ansible-playbook --inventory ./inventory --syntax-check "$file"
-          done
+          ansible-playbook --inventory ./inventory --syntax-check $(find . -wholename "*/infra/*playbook.yaml" -type f)
 
       - name: Get changed playbooks
         id: files
