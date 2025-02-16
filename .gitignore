@@ -1,4 +1,5 @@
 .vscode
 .env
 .vars.yaml
+.ansible/
 venv/
