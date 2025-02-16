@@ -1,0 +1,65 @@
+- name: Deploy app
+  hosts: solidtime
+  gather_facts: false
+  vars:
+    app: solidtime
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Check if project exists
+      ansible.builtin.stat:
+        path: "$HOME/{{ app }}"
+      register: project
+    - name: Docker compose down
+      when: project.stat.exists
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"
+        state: absent
+    - name: Copy project
+      ansible.builtin.copy:
+        src: "./{{ app }}"
+        dest: "$HOME"
+        mode: "0744"
+
+    - name: Replace APP_KEY secret
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/laravel.env"
+        regexp: "APP_KEY_VALUE"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/solidtime', secret_name='APP_KEY')['value'] }}"
+    - name: Replace SMTP Password secret
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/laravel.env"
+        regexp: "SMTP_PASSWORD_VALUE"
+        replace: "{{ lookup('ansible.builtin.env', 'SMTP_PASSWORD') }}"
+    - name: Replace PASSPORT_PRIVATE_KEY secret
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/laravel.env"
+        regexp: "PASSPORT_PRIVATE_KEY_VALUE"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/solidtime', secret_name='PASSPORT_PRIVATE_KEY')['value'] }}"
+    - name: Replace PASSPORT_PUBLIC_KEY secret
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/laravel.env"
+        regexp: "PASSPORT_PUBLIC_KEY_VALUE"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/solidtime', secret_name='PASSPORT_PUBLIC_KEY')['value'] }}"
+    - name: Replace DB Password secret (app)
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/laravel.env"
+        regexp: "DB_PASSWORD_VALUE"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/solidtime', secret_name='DB_PASSWORD')['value'] }}"
+
+    - name: Replace DB Password secret (db)
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/.env"
+        regexp: "DB_PASSWORD_VALUE"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/solidtime', secret_name='DB_PASSWORD')['value'] }}"
+
+    - name: Docker compose up
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"
