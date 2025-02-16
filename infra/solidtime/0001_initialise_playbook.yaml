@@ -28,6 +28,7 @@
         number: 1
         state: present
       become: true
+
     - name: Create data filesystem
       community.general.filesystem:
         dev: /dev/disk/by-path/pci-0000:00:05.0-scsi-0:0:0:1-part1

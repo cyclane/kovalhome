@@ -14,6 +14,7 @@
           - python3-apt
           - gpg
       become: true
+
     - name: Add docker key
       ansible.builtin.apt_key:
         url: https://download.docker.com/linux/debian/gpg
