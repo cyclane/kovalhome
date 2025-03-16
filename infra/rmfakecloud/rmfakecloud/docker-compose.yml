@@ -6,5 +6,7 @@ services:
       - .env
     volumes:
       - data:/data
+    ports:
+      - 3000:3000
 volumes:
   data:
