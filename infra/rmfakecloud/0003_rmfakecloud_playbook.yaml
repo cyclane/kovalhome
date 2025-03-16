@@ -1,0 +1,40 @@
+- name: Deploy app
+  hosts: rmfakecloud
+  gather_facts: false
+  vars:
+    app: rmfakecloud
+  tasks:
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Check if project exists
+      ansible.builtin.stat:
+        path: "$HOME/{{ app }}"
+      register: project
+    - name: Docker compose down
+      when: project.stat.exists
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"
+        state: absent
+    - name: Copy project
+      ansible.builtin.copy:
+        src: "./{{ app }}"
+        dest: "$HOME"
+        mode: "0744"
+
+    - name: Replace JWT_SECRET_KEY secret
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/.env"
+        regexp: "JWT_SECRET_KEY_VALUE"
+        replace: "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+                            path='/rmfakecloud', secret_name='JWT_SECRET_KEY')['value'] }}"
+    - name: Replace SMTP Password secret
+      ansible.builtin.replace:
+        path: "$HOME/{{ app }}/.env"
+        regexp: "SMTP_PASSWORD_VALUE"
+        replace: "{{ lookup('ansible.builtin.env', 'SMTP_PASSWORD') }}"
+
+    - name: Docker compose up
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"

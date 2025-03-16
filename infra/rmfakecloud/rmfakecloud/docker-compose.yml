@@ -1,0 +1,10 @@
+services:
+  rmfakecloud:
+    image: ddvk/rmfakecloud
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - data:/data
+volumes:
+  data:
