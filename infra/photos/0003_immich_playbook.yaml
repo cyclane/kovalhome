@@ -11,6 +11,7 @@
       ansible.builtin.stat:
         path: "$HOME/{{ app }}"
       register: project
+
     - name: Docker compose down
       when: project.stat.exists
       community.docker.docker_compose_v2:
