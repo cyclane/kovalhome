@@ -2,7 +2,7 @@
   hosts: finance
   gather_facts: false
   vars:
-    app: firefly-iii
+    app: actual
   tasks:
     - name: Wait for connection
       ansible.builtin.wait_for_connection:
@@ -17,9 +17,11 @@
       community.docker.docker_compose_v2:
         project_src: "$HOME/{{ app }}"
         state: absent
-    - name: Remove project directory
-      when: project.stat.exists
-      ansible.builtin.file:
-        path: "$HOME/{{ app }}"
-        state: absent
-    # Note: we keep db data, just-in-case
+    - name: Copy project
+      ansible.builtin.copy:
+        src: "./{{ app }}"
+        dest: "$HOME"
+        mode: "0744"
+    - name: Docker compose up
+      community.docker.docker_compose_v2:
+        project_src: "$HOME/{{ app }}"
