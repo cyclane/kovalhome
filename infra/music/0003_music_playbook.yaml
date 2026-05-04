@@ -27,22 +27,30 @@
       ansible.builtin.replace:
         path: "{{ user.home }}/{{ app }}/.env"
         regexp: "LASTFM_APIKEY_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='LASTFM_APIKEY')['value'] }}"
+        replace:
+          "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+          path='/music', secret_name='LASTFM_APIKEY')['value'] }}"
     - name: Replace LastFM secret
       ansible.builtin.replace:
         path: "{{ user.home }}/{{ app }}/.env"
         regexp: "LASTFM_SECRET_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='LASTFM_SECRET')['value'] }}"
+        replace:
+          "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+          path='/music', secret_name='LASTFM_SECRET')['value'] }}"
     - name: Replace Mongo Password secret
       ansible.builtin.replace:
         path: "{{ user.home }}/{{ app }}/.env"
         regexp: "SPOTIFY_ID_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='SPOTIFY_ID')['value'] }}"
+        replace:
+          "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+          path='/music', secret_name='SPOTIFY_ID')['value'] }}"
     - name: Replace SMTP Password secret
       ansible.builtin.replace:
         path: "{{ user.home }}/{{ app }}/.env"
         regexp: "SPOTIFY_SECRET_VALUE"
-        replace: "{{ lookup('infisical.vault.read_secrets', env_slug='prod', path='/music', secret_name='SPOTIFY_SECRET')['value'] }}"
+        replace:
+          "{{ lookup('infisical.vault.read_secrets', project_id=infisical_project, env_slug='prod',
+          path='/music', secret_name='SPOTIFY_SECRET')['value'] }}"
 
     - name: Docker compose up -d
       ansible.builtin.command: docker compose up -d
