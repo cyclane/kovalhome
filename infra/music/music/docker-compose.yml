@@ -18,26 +18,29 @@ services:
     volumes:
       - /mnt/nvme/navidrome:/data
       - /mnt/media/music:/music:ro
-  metube:
-    image: ghcr.io/alexta69/metube
+  # picard:
+  #   image: mikenye/picard:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - 5800:5800
+  #   volumes:
+  #     - /mnt/nvme/picard:/config:rw
+  #     - /mnt/media/music:/storage/music:rw
+  #     - /mnt/media/downloads:/storage/downloads:rw
+  yubal:
+    image: ghcr.io/guillevc/yubal:latest
     restart: unless-stopped
     ports:
-      - 8081:8081
+      - 8000:8000
     environment:
-      - STATE_DIR=/data/.metube
-      - TEMP_DIR=/data/downloads
+      PUID: 1000
+      PGID: 1000
+      YUBAL_SCHEDULER_CRON: "0 0 * * *"
+      YUBAL_DOWNLOAD_UGC: false
+      YUBAL_TZ: Europe/London
     volumes:
-      - /mnt/nvme/metube:/data
-      - /mnt/media/downloads:/downloads
-  picard:
-    image: mikenye/picard:latest
-    restart: unless-stopped
-    ports:
-      - 5800:5800
-    volumes:
-      - /mnt/nvme/picard:/config:rw
-      - /mnt/media/music:/storage/music:rw
-      - /mnt/media/downloads:/storage/downloads:rw
+      - yubal_data:/app/data
+      - yubal_config:/app/config
   filebrowser:
     image: filebrowser/filebrowser
     restart: unless-stopped
@@ -50,3 +53,9 @@ services:
       - /mnt/nvme/filebrowser:/config
       - /mnt/media/downloads:/srv/downloads
       - /mnt/media/music:/srv/music
+
+volumes:
+  navidrome_data:
+  yubal_data:
+  yubal_config:
+  filebrowser_config:
